@@ -2,6 +2,7 @@ package com.gt.datafetcher.gtdatafetcher.fetcher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gt.datafetcher.gtdatafetcher.db.CandleDBService;
 import com.gt.datafetcher.gtdatafetcher.dto.Kline;
 import com.gt.datafetcher.gtdatafetcher.dto.Ticker;
 import com.gt.datafetcher.gtdatafetcher.pojo.KlineStreamData;
@@ -18,6 +19,9 @@ public class BinanceEventHandler {
     private KlineStreamHandler klineStreamHandler;
     @Autowired
     private TickerStreamHandler tickerStreamHandler;
+
+    @Autowired
+    private CandleDBService candleDBService;
 
     private ObjectMapper klineObjectMapperD;
     private ObjectMapper klineObjectMapperS;
@@ -60,6 +64,11 @@ public class BinanceEventHandler {
 
         //Publish to Websocket
         klineStreamHandler.publishKlineEventToTopic(eventKey, klineString);
+        //If candle closes, insert to MongoDB Collection
+        if (kline.isKlineClosed()) {
+            System.out.println(klineString);
+            candleDBService.asyncInsertCandleData(kline, eventKey);
+        }
     }
 
     public void handleTickerEvent(String event) {
