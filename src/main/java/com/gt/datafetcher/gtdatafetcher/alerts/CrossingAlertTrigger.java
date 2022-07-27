@@ -30,6 +30,8 @@ public class CrossingAlertTrigger {
         List<Alert> alertList =
                 alertDBService.getAlertsForAPriceRange(ticker.getProvider(), ticker.getSymbol(),
                         oldPrice, ticker.getLastPrice());
+        if (alertList.isEmpty()) return;
+
         //Check whether they have already been triggered and Filter them
         List<String> filteredAlerts = recentTriggeredAlertStore.filterTriggeredAlerts(eventKey, alertList);
 
