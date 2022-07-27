@@ -32,17 +32,29 @@ public class BinanceConnector {
     }
 
     private void createConnections() {
-        this.websocketClient = new WebsocketClientImpl();
-        this.websocketClient2 = new WebsocketClientImpl();
         subscribeToKlineStreams();
         subscribeToTickerStreams();
     }
 
     private void subscribeToKlineStreams() {
-        this.websocketClient.combineStreams(this.klineStreams, ( (event) -> eventHandler.handleKlineStreamEvent(event)));
+        this.websocketClient = new WebsocketClientImpl();
+        this.websocketClient.combineStreams(
+                this.klineStreams, new NoopCallback(), ( (event) -> eventHandler.handleKlineStreamEvent(event)),
+                new ReconnectKlineStreamCallback(this), new NoopCallback());
     }
 
     private void subscribeToTickerStreams() {
-        this.websocketClient2.combineStreams(this.tickerStreams, ( (event) -> eventHandler.handleTickerEvent(event)));
+        this.websocketClient2 = new WebsocketClientImpl();
+        this.websocketClient2.combineStreams(this.tickerStreams, new NoopCallback(),
+                ( (event) -> eventHandler.handleTickerEvent(event)),
+                new ReconnectTickerStreamCallback(this), new NoopCallback());
+    }
+
+    public void reconnectToKlineStreamsOnClose() {
+        this.subscribeToKlineStreams();
+    }
+
+    public void reconnectToTickerStreamsOnClose() {
+        this.subscribeToTickerStreams();
     }
 }
