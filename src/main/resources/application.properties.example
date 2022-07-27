@@ -9,3 +9,6 @@ custom.cors.allowed_urls=http://localhost
 #Asyncronous Method Handling + Thread Pool
 custom.concurrency.async.config.core_pool_size=20
 custom.concurrency.async.config.max_pool_size=1000
+
+#Alerts Triggering
+custom.alerts.to_be_triggered_alerts_endpoint=http://localhost:3000/alerts/trigger-alerts

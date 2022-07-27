@@ -2,6 +2,8 @@ package com.gt.datafetcher.gtdatafetcher.fetcher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gt.datafetcher.gtdatafetcher.alerts.CrossingAlertTrigger;
+import com.gt.datafetcher.gtdatafetcher.alerts.PriceStore;
 import com.gt.datafetcher.gtdatafetcher.db.CandleDBService;
 import com.gt.datafetcher.gtdatafetcher.dto.Kline;
 import com.gt.datafetcher.gtdatafetcher.dto.Ticker;
@@ -22,6 +24,12 @@ public class BinanceEventHandler {
 
     @Autowired
     private CandleDBService candleDBService;
+
+    @Autowired
+    private CrossingAlertTrigger crossingAlertTrigger;
+
+    @Autowired
+    private PriceStore priceStore;
 
     private ObjectMapper klineObjectMapperD;
     private ObjectMapper klineObjectMapperS;
@@ -66,7 +74,6 @@ public class BinanceEventHandler {
         klineStreamHandler.publishKlineEventToTopic(eventKey, klineString);
         //If candle closes, insert to MongoDB Collection
         if (kline.isKlineClosed()) {
-            System.out.println(klineString);
             candleDBService.asyncInsertCandleData(kline, eventKey);
         }
     }
@@ -98,5 +105,10 @@ public class BinanceEventHandler {
 
         //Publish to Websocket
         tickerStreamHandler.publishTickerEventToTopic(eventKey, tickerString);
+
+        //Store the newPrice in PriceStore and retrieve previous price
+        Float oldPrice = priceStore.getOldPriceAndPutNewPrice(eventKey, ticker.getLastPrice());
+        //Trigger relevant Alerts
+        crossingAlertTrigger.triggerCrossingAlerts(ticker, eventKey, oldPrice);
     }
 }
