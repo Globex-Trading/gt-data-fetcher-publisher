@@ -15,6 +15,6 @@ public class ReconnectKlineStreamCallback implements WebSocketCallback {
         System.out.println(s);
 
         //Reconnect
-        binanceConnector.reconnectToKlineStreamsOnClose();
+        //binanceConnector.reconnectToKlineStreamsOnClose();
     }
 }

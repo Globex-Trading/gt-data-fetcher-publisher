@@ -57,4 +57,17 @@ public class BinanceConnector {
     public void reconnectToTickerStreamsOnClose() {
         this.subscribeToTickerStreams();
     }
+
+    public void closeKlineStreams() {
+        this.websocketClient.closeAllConnections();
+    }
+
+    public void closeTickerStreams() {
+        this.websocketClient2.closeAllConnections();
+    }
+
+    public void closeAllStreams() {
+        closeKlineStreams();
+        closeTickerStreams();
+    }
 }
