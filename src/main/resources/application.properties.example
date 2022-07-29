@@ -1,5 +1,4 @@
 spring.data.mongodb.uri=mongodb://localhost:27017/mde
-spring.data.mongodb.database=mde
 
 #Custom Configuration
 
