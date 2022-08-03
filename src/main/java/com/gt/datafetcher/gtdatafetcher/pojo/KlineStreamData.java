@@ -21,7 +21,7 @@ public class KlineStreamData {
             public float c;
             public float h;
             public float l;
-            public String v;
+            public float v;
             public String n;
             public String x;
             public String q;

@@ -21,7 +21,7 @@ public class TickerStreamData {
         public float o;
         public float h;
         public float l;
-        public String v;
+        public float v;
         public String q;
         public String O;
         public String C;

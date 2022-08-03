@@ -28,4 +28,6 @@ public class Candle {
     private Decimal128 high_price;
     @Field(targetType = FieldType.DECIMAL128)
     private Decimal128 low_price;
+    @Field(targetType = FieldType.DECIMAL128)
+    private Decimal128 volume;
 }

@@ -29,7 +29,8 @@ public class CandleDBService {
                 Decimal128.parse(Float.toString(kline.getOpenPrice())),
                 Decimal128.parse(Float.toString(kline.getClosePrice())),
                 Decimal128.parse(Float.toString(kline.getHighPrice())),
-                Decimal128.parse(Float.toString(kline.getLowPrice()))
+                Decimal128.parse(Float.toString(kline.getLowPrice())),
+                Decimal128.parse(Float.toString(kline.getVolume()))
                 );
 
         //mongoTemplate.insert(candle, eventKey);

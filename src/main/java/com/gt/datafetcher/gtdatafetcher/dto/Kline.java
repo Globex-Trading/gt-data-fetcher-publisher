@@ -24,6 +24,9 @@ public class Kline {
     private float highPrice;
     private float lowPrice;
 
+    //Take quote asset volume
+    private float volume;
+
     private boolean isKlineClosed;
 
     private long eventTime;

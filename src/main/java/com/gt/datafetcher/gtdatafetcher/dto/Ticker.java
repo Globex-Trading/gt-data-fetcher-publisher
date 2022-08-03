@@ -22,4 +22,7 @@ public class Ticker {
     private float openPrice;
     private float highPrice;
     private float lowPrice;
+
+    // Total traded base asset volume
+    private float volume;
 }

@@ -57,7 +57,8 @@ public class BinanceEventHandler {
         //Map to a Common DTO Object
         Kline kline = new Kline("binance", "kline_" + klineStreamData.data.k.i, klineStreamData.data.s,
                 klineStreamData.data.k.t, klineStreamData.data.k.T, klineStreamData.data.k.i,
-                klineStreamData.data.k.o, klineStreamData.data.k.c, klineStreamData.data.k.h, klineStreamData.data.k.l,
+                klineStreamData.data.k.o, klineStreamData.data.k.c, klineStreamData.data.k.h,
+                klineStreamData.data.k.l, klineStreamData.data.k.v,
                 Boolean.parseBoolean(klineStreamData.data.k.x), klineStreamData.data.E);
 
         String klineString;
@@ -91,7 +92,7 @@ public class BinanceEventHandler {
         //Map to a Common DTO Object
         Ticker ticker = new Ticker("binance", "ticker_" + tickerStreamData.data.s, tickerStreamData.data.E,
                 tickerStreamData.data.s, tickerStreamData.data.p, tickerStreamData.data.P, tickerStreamData.data.c,
-                tickerStreamData.data.o, tickerStreamData.data.h, tickerStreamData.data.l);
+                tickerStreamData.data.o, tickerStreamData.data.h, tickerStreamData.data.l, tickerStreamData.data.v);
 
         String tickerString;
         try {
