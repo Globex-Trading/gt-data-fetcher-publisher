@@ -1,5 +1,7 @@
 package com.gt.datafetcher.gtdatafetcher.utilities;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gt.datafetcher.gtdatafetcher.dto.ProviderResponse;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,8 +22,11 @@ public class OkHTTPUtility {
     @Value("${custom.alerts.to_be_triggered_alerts_endpoint}")
     private String toBeTriggeredAlertsEndpoint;
 
+    @Value("${custom.symbols.endpoint}")
+    private String symbolsEndpoint;
+
     public OkHTTPUtility() {
-        okHttpClient = new OkHttpClient.Builder()
+        this.okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -38,8 +43,7 @@ public class OkHTTPUtility {
                 .post(RequestBody.create(body.toString(), OkHTTPUtility.JSON))
                 .build();
 
-        try {
-            Response response = okHttpClient.newCall(request).execute();
+        try (Response response = okHttpClient.newCall(request).execute()) {
             if(response.isSuccessful()) return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,4 +52,29 @@ public class OkHTTPUtility {
 
         return false;
     }
+
+    public ProviderResponse getAvailableSymbolsAndTimeframes () {
+        Request request = new Request.Builder()
+                .url(symbolsEndpoint)
+                .build();
+
+        try (Response response = okHttpClient.newCall(request).execute()) {
+            if(response.isSuccessful()) {
+                if(response.body() != null) {
+                    String responseBody = response.body().string();
+                    System.out.println("Received Symbols and Timeframes\n" + responseBody);
+
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    return objectMapper.readValue(responseBody, ProviderResponse.class);
+                }
+            } else {
+                System.out.println("Error fetching Symbols from API.");
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
