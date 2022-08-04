@@ -41,4 +41,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/globex-trading/gt-data-fetcher-publisher:latest
+          tags: ghcr.io/globex-trading/gt-data-fetcher-publisher:latest,ghcr.io/globex-trading/gt-data-fetcher-publisher:1.0.0
