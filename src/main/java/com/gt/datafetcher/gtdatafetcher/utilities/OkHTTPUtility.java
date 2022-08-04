@@ -2,6 +2,7 @@ package com.gt.datafetcher.gtdatafetcher.utilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gt.datafetcher.gtdatafetcher.dto.ProviderResponse;
+import com.gt.datafetcher.gtdatafetcher.enums.Endpoints;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,11 +20,8 @@ public class OkHTTPUtility {
 
     private final OkHttpClient okHttpClient;
 
-    @Value("${custom.alerts.to_be_triggered_alerts_endpoint}")
-    private String toBeTriggeredAlertsEndpoint;
-
-    @Value("${custom.symbols.endpoint}")
-    private String symbolsEndpoint;
+    @Value("${custom.gt-api.hostname}")
+    private String gtAPIHostname;
 
     public OkHTTPUtility() {
         this.okHttpClient = new OkHttpClient.Builder()
@@ -39,7 +37,7 @@ public class OkHTTPUtility {
         body.put("alert_ids", alertIdsJsonArray);
 
         Request request = new Request.Builder()
-                .url(toBeTriggeredAlertsEndpoint)
+                .url(gtAPIHostname + Endpoints.ALERT_TRIGGER_ENDPOINT.getEndpoint())
                 .post(RequestBody.create(body.toString(), OkHTTPUtility.JSON))
                 .build();
 
@@ -55,7 +53,7 @@ public class OkHTTPUtility {
 
     public ProviderResponse getAvailableSymbolsAndTimeframes () {
         Request request = new Request.Builder()
-                .url(symbolsEndpoint)
+                .url(gtAPIHostname + Endpoints.SYMBOL_FETCH_ENDPOINT.getEndpoint())
                 .build();
 
         try (Response response = okHttpClient.newCall(request).execute()) {
