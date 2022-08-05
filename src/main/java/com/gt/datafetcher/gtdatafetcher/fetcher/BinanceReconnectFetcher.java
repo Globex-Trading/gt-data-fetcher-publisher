@@ -9,7 +9,7 @@ public class BinanceReconnectFetcher {
     @Autowired
     private BinanceConnector binanceConnector;
 
-    @Scheduled(cron = "5 2 1 * * *", zone = "UTC")
+    @Scheduled(cron = "5 2 1,13 * * *", zone = "UTC")
     public void reconnectBinanceFetcherEveryDay() {
         System.out.println("Reconnecting Binance Fetcher.");
         System.out.println("Waiting to acquire lock...");
