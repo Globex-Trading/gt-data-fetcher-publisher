@@ -1,31 +1,25 @@
 package com.gt.datafetcher.gtdatafetcher.fetcher;
 
 import com.binance.connector.client.impl.WebsocketClientImpl;
-import com.gt.datafetcher.gtdatafetcher.constants.Constants;
+import com.gt.datafetcher.gtdatafetcher.constants.BinanceSymbolsTimeframes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class BinanceConnector {
     private WebsocketClientImpl websocketClient;
 
-    private final Map<String, Integer> connectionIDs;
+    private final Map<String, Set<Integer>> connectionIDs;
 
-    ArrayList<String> klineStreams;
-    ArrayList<String> tickerStreams;
+    @Autowired
+    private BinanceSymbolsTimeframes binanceSymbolsTimeframes;
 
     @Autowired
     private BinanceEventHandler eventHandler;
 
-    @Autowired
-    public BinanceConnector(Constants constants) {
-        klineStreams = constants.getAllKlineStreamNames();
-        tickerStreams = constants.getAllMiniTickerStreamNames();
-
+    public BinanceConnector() {
         this.connectionIDs = new HashMap<>();
     }
 
@@ -40,17 +34,35 @@ public class BinanceConnector {
     }
 
     private void subscribeToKlineStreams() {
-        int id = this.websocketClient.combineStreams(
-                this.klineStreams, new NoopCallback(), ( (event) -> eventHandler.handleKlineStreamEvent(event)),
-                new NoopCallback(), new NoopCallback());
-        this.connectionIDs.put("KlineStreamID", id);
+        List<ArrayList<String>> allStreamsList = this.binanceSymbolsTimeframes.getAllKlineStreamsSeparated();
+        for (ArrayList<String> streamsList: allStreamsList) {
+            int id = this.websocketClient.combineStreams(
+                    streamsList, new NoopCallback(), ( (event) -> eventHandler.handleKlineStreamEvent(event)),
+                    new NoopCallback(), new NoopCallback());
+            this.putConnectionIDToMap("KlineStreamID", id);
+        }
+
+
     }
 
     private void subscribeToTickerStreams() {
-        int id = this.websocketClient.combineStreams(this.tickerStreams, new NoopCallback(),
-                ( (event) -> eventHandler.handleTickerEvent(event)),
-                new NoopCallback(), new NoopCallback());
-        this.connectionIDs.put("TickerStreamID", id);
+        List<ArrayList<String>> allStreamsList = this.binanceSymbolsTimeframes.getAllTickerStreamsSeparated();
+        for (ArrayList<String> streamsList: allStreamsList) {
+            int id = this.websocketClient.combineStreams(
+                    streamsList,
+                    new NoopCallback(),
+                    ( (event) -> eventHandler.handleTickerEvent(event)),
+                    new NoopCallback(), new NoopCallback());
+            this.putConnectionIDToMap("TickerStreamID", id);
+        }
+
+    }
+
+    private void putConnectionIDToMap(String key, int id) {
+        if (!this.connectionIDs.containsKey(key)) {
+            this.connectionIDs.put(key, new HashSet<>());
+        }
+        this.connectionIDs.get(key).add(id);
     }
 
     public void reconnectToKlineStreams() {
@@ -71,19 +83,26 @@ public class BinanceConnector {
 
     public void closeKlineStreams() {
         if(this.connectionIDs.containsKey("KlineStreamID")) {
-            this.websocketClient.closeConnection(this.connectionIDs.get("KlineStreamID"));
-            this.connectionIDs.remove("KlineStreamID");
+            Set<Integer> currentConnectionIDs = this.connectionIDs.get("KlineStreamID");
+            for (int id : currentConnectionIDs) {
+                this.websocketClient.closeConnection(id);
+                this.connectionIDs.remove("KlineStreamID");
+            }
         } else {
-            System.out.println("Kline stream already closed.");
+            System.out.println("No Kline streams available to be closed.");
         }
     }
 
     public void closeTickerStreams() {
         if(this.connectionIDs.containsKey("TickerStreamID")) {
-            this.websocketClient.closeConnection(this.connectionIDs.get("TickerStreamID"));
-            this.connectionIDs.remove("TickerStreamID");
+            Set<Integer> currentConnectionIDs = this.connectionIDs.get("TickerStreamID");
+            for (int id : currentConnectionIDs) {
+                this.websocketClient.closeConnection(id);
+                this.connectionIDs.remove("TickerStreamID");
+            }
+
         } else {
-            System.out.println("Ticker stream already closed.");
+            System.out.println("No Ticker streams to be closed.");
         }
     }
 

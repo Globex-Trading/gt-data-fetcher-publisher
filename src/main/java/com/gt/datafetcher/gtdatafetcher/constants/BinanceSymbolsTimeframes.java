@@ -12,12 +12,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class Constants {
-    private List<String> currencyPairs;
-    private List<String> timePeriods;
+public class BinanceSymbolsTimeframes {
+    private final List<String> currencyPairs;
+    private final List<String> timePeriods;
+
+    private final int streamsPerConnection;
 
     @Autowired
-    public Constants(OkHTTPUtility okHTTPUtility) {
+    public BinanceSymbolsTimeframes(OkHTTPUtility okHTTPUtility) {
+        this.streamsPerConnection = 5;
+
         ProviderResponse providerResponse = okHTTPUtility.getAvailableSymbolsAndTimeframes();
         if(providerResponse != null) {
             this.currencyPairs = providerResponse.symbols
@@ -46,11 +50,43 @@ public class Constants {
         return streamNames;
     }
 
-    public ArrayList<String> getAllMiniTickerStreamNames() {
+    public List<ArrayList<String>> getAllKlineStreamsSeparated() {
+        List<ArrayList<String>> streamNames = new LinkedList<>();
+
+        ArrayList<String> tempList = new ArrayList<>(this.streamsPerConnection);
+        for (String cp : currencyPairs) {
+            for (String tp: timePeriods) {
+                if (tempList.size() >= this.streamsPerConnection) {
+                    streamNames.add(tempList);
+                    tempList = new ArrayList<>(this.streamsPerConnection);
+                }
+                tempList.add(cp + "@kline_" + tp);
+            }
+        }
+        streamNames.add(tempList);
+        return streamNames;
+    }
+
+    public ArrayList<String> getAllTickerStreamNames() {
         ArrayList<String> streamNames = new ArrayList<>();
         for (String cp : currencyPairs) {
             streamNames.add(cp + "@ticker");
         }
+        return streamNames;
+    }
+
+    public List<ArrayList<String>> getAllTickerStreamsSeparated() {
+        List<ArrayList<String>> streamNames = new LinkedList<>();
+
+        ArrayList<String> tempList = new ArrayList<>(this.streamsPerConnection);
+        for (String cp : currencyPairs) {
+            if (tempList.size() >= this.streamsPerConnection) {
+                streamNames.add(tempList);
+                tempList = new ArrayList<>(this.streamsPerConnection);
+            }
+            tempList.add(cp + "@ticker");
+        }
+        streamNames.add(tempList);
         return streamNames;
     }
 }

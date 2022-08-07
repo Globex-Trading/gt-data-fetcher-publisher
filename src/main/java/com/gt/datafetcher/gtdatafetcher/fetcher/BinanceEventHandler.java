@@ -31,10 +31,10 @@ public class BinanceEventHandler {
     @Autowired
     private PriceStore priceStore;
 
-    private ObjectMapper klineObjectMapperD;
-    private ObjectMapper klineObjectMapperS;
-    private ObjectMapper tickerObjectMapperD;
-    private ObjectMapper tickerObjectMapperS;
+    private final ObjectMapper klineObjectMapperD;
+    private final ObjectMapper klineObjectMapperS;
+    private final ObjectMapper tickerObjectMapperD;
+    private final ObjectMapper tickerObjectMapperS;
 
 
     public BinanceEventHandler() {
@@ -71,6 +71,7 @@ public class BinanceEventHandler {
         String eventKey = kline.getProvider()+"_"+kline.getSymbol()+"_"+kline.getInterval();
         //System.out.println(Duration.ofNanos(System.nanoTime() - start));
 
+        //System.out.println(klineString);
         //Publish to Websocket
         klineStreamHandler.publishKlineEventToTopic(eventKey, klineString);
         //If candle closes, insert to MongoDB Collection

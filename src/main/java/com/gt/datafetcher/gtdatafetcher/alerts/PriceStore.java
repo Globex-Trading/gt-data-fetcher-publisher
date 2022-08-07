@@ -2,23 +2,27 @@ package com.gt.datafetcher.gtdatafetcher.alerts;
 
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class PriceStore {
-    private Map<String, Float> previousPrices;
+    private final Map<String, Price> previousPrices;
 
     public PriceStore() {
-        this.previousPrices = new HashMap<>();
+        this.previousPrices = new ConcurrentHashMap<>();
     }
 
     public Float getOldPriceAndPutNewPrice(String eventKey, float newPrice) {
+
         Float oldPrice = null;
         if (previousPrices.containsKey(eventKey)) {
-            oldPrice = previousPrices.get(eventKey);
+            oldPrice = previousPrices.get(eventKey).getOldPriceAndPutNewPrice(newPrice);
+        } else {
+            previousPrices.put(eventKey, new Price(newPrice));
         }
-        previousPrices.put(eventKey, newPrice);
+        /*System.out.println("Accessed by thread name - " + Thread.currentThread().getId() + "\n" + eventKey
+        + "\nold price - " + oldPrice + "\nnew price - " + newPrice);*/
         return oldPrice;
     }
 }
