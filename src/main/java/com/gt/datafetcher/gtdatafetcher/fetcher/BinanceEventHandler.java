@@ -28,9 +28,6 @@ public class BinanceEventHandler {
     @Autowired
     private CrossingAlertTrigger crossingAlertTrigger;
 
-    @Autowired
-    private PriceStore priceStore;
-
     private final ObjectMapper klineObjectMapperD;
     private final ObjectMapper klineObjectMapperS;
     private final ObjectMapper tickerObjectMapperD;
@@ -80,7 +77,7 @@ public class BinanceEventHandler {
         }
     }
 
-    public void handleTickerEvent(String event) {
+    public void handleTickerEvent(String event, PriceStore providedPriceStore) {
         //long start = System.nanoTime();
         TickerStreamData tickerStreamData;
         try {
@@ -109,7 +106,7 @@ public class BinanceEventHandler {
         tickerStreamHandler.publishTickerEventToTopic(eventKey, tickerString);
 
         //Store the newPrice in PriceStore and retrieve previous price
-        Float oldPrice = priceStore.getOldPriceAndPutNewPrice(eventKey, ticker.getLastPrice());
+        Float oldPrice = providedPriceStore.getOldPriceAndPutNewPrice(eventKey, ticker.getLastPrice());
         //Trigger relevant Alerts
         crossingAlertTrigger.triggerCrossingAlerts(ticker, eventKey, oldPrice);
     }

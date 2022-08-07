@@ -1,6 +1,7 @@
 package com.gt.datafetcher.gtdatafetcher.fetcher;
 
 import com.binance.connector.client.impl.WebsocketClientImpl;
+import com.gt.datafetcher.gtdatafetcher.alerts.PriceStore;
 import com.gt.datafetcher.gtdatafetcher.constants.BinanceSymbolsTimeframes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,10 +49,12 @@ public class BinanceConnector {
     private void subscribeToTickerStreams() {
         List<ArrayList<String>> allStreamsList = this.binanceSymbolsTimeframes.getAllTickerStreamsSeparated();
         for (ArrayList<String> streamsList: allStreamsList) {
+            PriceStore priceStore = new PriceStore();
+
             int id = this.websocketClient.combineStreams(
                     streamsList,
                     new NoopCallback(),
-                    ( (event) -> eventHandler.handleTickerEvent(event)),
+                    ( (event) -> eventHandler.handleTickerEvent(event, priceStore)),
                     new NoopCallback(), new NoopCallback());
             this.putConnectionIDToMap("TickerStreamID", id);
         }

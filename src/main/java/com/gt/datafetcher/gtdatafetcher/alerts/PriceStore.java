@@ -1,16 +1,19 @@
 package com.gt.datafetcher.gtdatafetcher.alerts;
 
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class PriceStore {
+
+    private static final Logger logger = LoggerFactory.getLogger(PriceStore.class);
+
     private final Map<String, Price> previousPrices;
 
     public PriceStore() {
-        this.previousPrices = new ConcurrentHashMap<>();
+        this.previousPrices = new HashMap<>();
     }
 
     public Float getOldPriceAndPutNewPrice(String eventKey, float newPrice) {
@@ -21,8 +24,7 @@ public class PriceStore {
         } else {
             previousPrices.put(eventKey, new Price(newPrice));
         }
-        /*System.out.println("Accessed by thread name - " + Thread.currentThread().getId() + "\n" + eventKey
-        + "\nold price - " + oldPrice + "\nnew price - " + newPrice);*/
+
         return oldPrice;
     }
 }

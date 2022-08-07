@@ -39,14 +39,12 @@
         <appender-ref ref="Console" />
     </root>
 
-    <!-- LOG "com.zinex*" at TRACE level -->
     <logger name="com.gt" level="info,warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
 
-    <!-- LOG "com.zinex*" at TRACE level -->
-    <logger name="com.binance" level="info,warn,debug" additivity="false">
+    <logger name="com.binance" level="info,warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
