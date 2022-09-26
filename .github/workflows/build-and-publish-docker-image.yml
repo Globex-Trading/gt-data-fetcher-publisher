@@ -42,3 +42,11 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/globex-trading/gt-data-fetcher-publisher:latest,ghcr.io/globex-trading/gt-data-fetcher-publisher:1.0.0
+
+      - name: Dispatch the event to GT-Launcher for redeployment
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GT_LAUNCHER_REPOSITORY_DISPATCH_PAT }}
+          repository: globex-trading/gt-launcher
+          event-type: trigger-test-and-redeploy-event
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "repo": "${{ github.repository }}"}'
