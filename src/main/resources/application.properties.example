@@ -1,5 +1,10 @@
 spring.data.mongodb.uri=mongodb://localhost:27017/mde
 
+# SSL/TLS Configuration
+server.port=8080
+server.ssl.certificate=classpath:certs/fullchain.pem
+server.ssl.certificate-private-key=classpath:certs/privkey.pem
+
 #Custom Configuration
 
 #CORS Policy
