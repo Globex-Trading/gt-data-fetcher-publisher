@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +43,7 @@ public class OkHTTPUtility {
                 .build();
 
         ResponseBodyDTO response = sendRequest(request);
-        return response.isSuccessful();
+        return response != null && response.isSuccessful();
 
     }
 
@@ -54,7 +53,7 @@ public class OkHTTPUtility {
                 .build();
 
         ResponseBodyDTO response = sendRequest(request);
-        if(response.isSuccessful()) {
+        if(response != null && response.isSuccessful()) {
             if(response.getBody() != null) {
                 String responseBody = response.getBody();
                 System.out.println("Received Symbols and Timeframes\n" + responseBody);
@@ -79,7 +78,7 @@ public class OkHTTPUtility {
             ResponseBodyDTO responseBodyDTO = new ResponseBodyDTO(response.code(), response.message());
             if (response.body() != null) responseBodyDTO.setBody(response.body().string());
             return responseBodyDTO;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
