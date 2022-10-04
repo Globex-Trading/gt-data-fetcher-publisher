@@ -1,7 +1,9 @@
 package com.gt.datafetcher.gtdatafetcher.utilities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gt.datafetcher.gtdatafetcher.dto.ProviderResponse;
+import com.gt.datafetcher.gtdatafetcher.dto.ResponseBodyDTO;
 import com.gt.datafetcher.gtdatafetcher.enums.Endpoints;
 import okhttp3.*;
 import org.json.JSONArray;
@@ -41,14 +43,9 @@ public class OkHTTPUtility {
                 .post(RequestBody.create(body.toString(), OkHTTPUtility.JSON))
                 .build();
 
-        try (Response response = okHttpClient.newCall(request).execute()) {
-            if(response.isSuccessful()) return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+        ResponseBodyDTO response = sendRequest(request);
+        return response.isSuccessful();
 
-        return false;
     }
 
     public ProviderResponse getAvailableSymbolsAndTimeframes () {
@@ -56,20 +53,33 @@ public class OkHTTPUtility {
                 .url(gtAPIHostname + Endpoints.SYMBOL_FETCH_ENDPOINT.getEndpoint())
                 .build();
 
-        try (Response response = okHttpClient.newCall(request).execute()) {
-            if(response.isSuccessful()) {
-                if(response.body() != null) {
-                    String responseBody = response.body().string();
-                    System.out.println("Received Symbols and Timeframes\n" + responseBody);
+        ResponseBodyDTO response = sendRequest(request);
+        if(response.isSuccessful()) {
+            if(response.getBody() != null) {
+                String responseBody = response.getBody();
+                System.out.println("Received Symbols and Timeframes\n" + responseBody);
 
-                    ObjectMapper objectMapper = new ObjectMapper();
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
                     return objectMapper.readValue(responseBody, ProviderResponse.class);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    return null;
                 }
-            } else {
-                System.out.println("Error fetching Symbols from API.");
             }
-            return null;
-        } catch (Exception e) {
+        } else {
+            System.out.println("Error fetching Symbols from API.");
+        }
+        return null;
+
+    }
+
+    public ResponseBodyDTO sendRequest(Request request) {
+        try (Response response = okHttpClient.newCall(request).execute()) {
+            ResponseBodyDTO responseBodyDTO = new ResponseBodyDTO(response.code(), response.message());
+            if (response.body() != null) responseBodyDTO.setBody(response.body().string());
+            return responseBodyDTO;
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
