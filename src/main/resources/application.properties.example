@@ -21,6 +21,7 @@ custom.gt-api.hostname=http://localhost:3000
 # Make the below field to true in order to enable external broker.
 # If it is false, just leave other custom.ws.message_queue fields empty.
 custom.ws.message_queue.enable_external_broker=false
+custom.ws.message_queue.enable_ssl=false
 custom.ws.message_queue.relay_host=localhost
 custom.ws.message_queue.relay_port=61613
 custom.ws.message_queue.client_login=guest
