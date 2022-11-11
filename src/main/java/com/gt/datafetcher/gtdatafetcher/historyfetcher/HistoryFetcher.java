@@ -2,6 +2,7 @@ package com.gt.datafetcher.gtdatafetcher.historyfetcher;
 
 import com.gt.datafetcher.gtdatafetcher.constants.BinanceSymbolsTimeframes;
 import com.gt.datafetcher.gtdatafetcher.db.CandleDBService;
+import com.gt.datafetcher.gtdatafetcher.dto.Kline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,9 @@ public class HistoryFetcher {
         for (String cp :currencyPairs) {
             for (String tf : timeframes) {
                 Long earliestCandleTime = getEarliestCandleTime(cp, tf);
-                binanceMarketDataClient.getPastKlineData(cp, tf, earliestCandleTime, null);
+                List<Kline> pastKlines = binanceMarketDataClient.getPastKlineData(cp, tf, earliestCandleTime, null);
+
+                break;
             }
         }
     }
