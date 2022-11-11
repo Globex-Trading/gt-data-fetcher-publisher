@@ -15,6 +15,9 @@ public class HistoryFetcher {
     @Autowired
     private CandleDBService candleDBService;
 
+    @Autowired
+    BinanceMarketDataClient binanceMarketDataClient;
+
     public void initiateHistoryFetcher(){
         start();
     }
@@ -25,12 +28,15 @@ public class HistoryFetcher {
 
         for (String cp :currencyPairs) {
             for (String tf : timeframes) {
-                System.out.println(getEarliestCandleTime(cp, tf));
+                Long earliestCandleTime = getEarliestCandleTime(cp, tf);
+                binanceMarketDataClient.getPastKlineData(cp, tf, earliestCandleTime, null);
             }
         }
     }
 
-    public long getEarliestCandleTime(String currencyPair, String timeframe){
-        return candleDBService.getEarliestCandleTime(currencyPair, timeframe);
+    public Long getEarliestCandleTime(String currencyPair, String timeframe){
+        long t = candleDBService.getEarliestCandleTime(currencyPair, timeframe);
+        if (t == -1) return null;
+        return t;
     }
 }
