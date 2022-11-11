@@ -40,6 +40,14 @@ public class BinanceSymbolsTimeframes {
 
     }
 
+    public List<String> getCurrencyPairs() {
+        return currencyPairs;
+    }
+
+    public List<String> getTimePeriods() {
+        return timePeriods;
+    }
+
     public ArrayList<String> getAllKlineStreamNames() {
         ArrayList<String> streamNames = new ArrayList<>();
         for (String cp : currencyPairs) {

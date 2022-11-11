@@ -5,6 +5,7 @@ import com.gt.datafetcher.gtdatafetcher.model.Candle;
 import org.bson.Document;
 import org.bson.types.Decimal128;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,9 +13,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Locale;
+
 @Service
 public class CandleDBService {
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -47,5 +50,19 @@ public class CandleDBService {
         Update updateDefinition = Update.fromDocument(document);
 
         mongoTemplate.upsert(query, updateDefinition, Candle.class , eventKey);
+    }
+
+    public long getEarliestCandleTime(String currencyPair, String timeframe) {
+        String collectionName = "binance_" + currencyPair.toUpperCase(Locale.ROOT) + "_" + timeframe;
+
+        Query query = new Query();
+        query.fields().include("open_time");
+        query.with(Sort.by(Sort.Direction.ASC, "open_time"));
+        query.limit(1);
+
+        List<Candle> earlyCandle = mongoTemplate.find(query, Candle.class, collectionName);
+        if(earlyCandle.isEmpty()) return -1;
+        Candle c = earlyCandle.get(0);
+        return c.getOpen_time();
     }
 }
