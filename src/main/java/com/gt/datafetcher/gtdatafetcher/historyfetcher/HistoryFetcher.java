@@ -6,6 +6,7 @@ import com.gt.datafetcher.gtdatafetcher.dto.Kline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -29,17 +30,34 @@ public class HistoryFetcher {
 
         for (String cp :currencyPairs) {
             for (String tf : timeframes) {
-                Long earliestCandleTime = getEarliestCandleTime(cp, tf);
-                List<Kline> pastKlines = binanceMarketDataClient.getPastKlineData(cp, tf, earliestCandleTime, null);
+                long[] earliestCandle = getEarliestCandleTime(cp, tf);
+                long numberOfPastCandles = 0;
+                Long earliestCandleOpenTime = null;
+                if (earliestCandle != null) {
+                    earliestCandleOpenTime = earliestCandle[0];
+                    long earliestCandleCloseTime = earliestCandle[1];
+                    long currentTime = Instant.now().toEpochMilli();
+                    long interval = earliestCandleCloseTime - earliestCandleOpenTime + 1;
 
-                break;
+                    numberOfPastCandles = (currentTime - earliestCandleOpenTime)/interval;
+                }
+                if (numberOfPastCandles > 900) continue;
+
+                //Fetch Data from Binance
+                List<Kline> pastKlines = binanceMarketDataClient.getPastKlineData(cp, tf, null, earliestCandleOpenTime);
+
+                //Save Data in database
+                persistPastKlines(pastKlines, cp, tf);
             }
         }
     }
 
-    public Long getEarliestCandleTime(String currencyPair, String timeframe){
-        long t = candleDBService.getEarliestCandleTime(currencyPair, timeframe);
-        if (t == -1) return null;
-        return t;
+    private long[] getEarliestCandleTime(String currencyPair, String timeframe){
+        return candleDBService.getEarliestCandleTime(currencyPair, timeframe);
     }
+
+    private void persistPastKlines(List<Kline> klines, String currencyPair, String timeframe) {
+        candleDBService.insertManyCandles(klines, currencyPair, timeframe);
+    }
+
 }

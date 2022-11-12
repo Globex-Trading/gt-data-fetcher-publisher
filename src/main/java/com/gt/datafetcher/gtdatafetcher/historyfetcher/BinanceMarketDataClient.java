@@ -28,7 +28,7 @@ public class BinanceMarketDataClient {
         properties.put("interval", timeframe);
         if (startTime != null) properties.put("startTime", startTime);
         if (endTime != null) properties.put("endTime", endTime);
-        properties.put("limit", 5);
+        properties.put("limit", 1000);
 
         String result = binanceMarketClient.klines(properties);
 
