@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Test and Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B -DskipTests=true package --file pom.xml
 
       - name: Set up Docker Buildx
         id: buildx
