@@ -11,7 +11,6 @@ import java.util.List;
 
 @Service
 public class AlertDBService {
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MongoTemplate mongoTemplate;
 
