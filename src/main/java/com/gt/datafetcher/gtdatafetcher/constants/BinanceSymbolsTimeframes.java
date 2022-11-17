@@ -23,7 +23,6 @@ public class BinanceSymbolsTimeframes {
         this.streamsPerConnection = 5;
 
         ProviderResponse providerResponse = okHTTPUtility.getAvailableSymbolsAndTimeframes();
-        providerResponse = null;
         if(providerResponse != null) {
             this.currencyPairs = providerResponse.symbols
                     .stream().map(String::toLowerCase).collect(Collectors.toList());

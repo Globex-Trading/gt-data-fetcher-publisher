@@ -79,7 +79,7 @@ public class CandleDBService {
         String collectionName = getCollectionName(currencyPair, timeframe);
 
         Query query = new Query();
-        query.fields().include("open_time");
+        query.fields().include("open_time", "close_time");
         query.with(Sort.by(Sort.Direction.ASC, "open_time"));
         query.limit(1);
 

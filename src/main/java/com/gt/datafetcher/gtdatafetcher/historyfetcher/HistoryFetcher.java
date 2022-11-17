@@ -32,16 +32,17 @@ public class HistoryFetcher {
             for (String tf : timeframes) {
                 long[] earliestCandle = getEarliestCandleTime(cp, tf);
                 long numberOfPastCandles = 0;
+                long multiplier = 1;
                 Long earliestCandleOpenTime = null;
                 if (earliestCandle != null) {
                     earliestCandleOpenTime = earliestCandle[0];
                     long earliestCandleCloseTime = earliestCandle[1];
                     long currentTime = Instant.now().toEpochMilli();
                     long interval = earliestCandleCloseTime - earliestCandleOpenTime + 1;
-
                     numberOfPastCandles = (currentTime - earliestCandleOpenTime)/interval;
+                    multiplier = interval/60000;
                 }
-                if (numberOfPastCandles > 900) continue;
+                if (numberOfPastCandles > 900/multiplier) continue;
 
                 //Fetch Data from Binance
                 List<Kline> pastKlines = binanceMarketDataClient.getPastKlineData(cp, tf, null, earliestCandleOpenTime);
